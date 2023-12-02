@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 class ParametresScreen extends StatefulWidget {
   const ParametresScreen({Key? key}) : super(key: key);
