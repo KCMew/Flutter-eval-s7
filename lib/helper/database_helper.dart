@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_import
+
 import 'package:evals7/Model/seance.dart';
 import 'package:evals7/helper/boxes.dart';
 import 'package:hive/hive.dart';

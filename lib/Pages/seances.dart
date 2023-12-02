@@ -40,15 +40,8 @@ class SeanceState extends State<WorkoutSessionsScreen> {
           children: [
             // Bouton pour afficher la zone
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: Colors.black),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
               child: const Text(
                 'Ajouter une nouvelle séance',
-                style: TextStyle(color: Colors.black),
               ),
               onPressed: () {
                 setState(() {
@@ -116,8 +109,8 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                               ),
                             ],
                             decoration: const InputDecoration(
-                              labelText: ' Nom de la séance',
-                              hintText: 'Entrez le nom de la séance',
+                              labelText: ' Jour de la séance',
+                              hintText: 'Entrez le jour de la séance',
                               border: OutlineInputBorder(),
                             ),
                             value: selectedJourType,
@@ -192,7 +185,7 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                 });
               },
               icon: const Icon(Icons.delete_outline),
-              label: const Text('Tous supprimer'),
+              label: const Text('Tout supprimer'),
             ),
             const SizedBox(height: 10.0),
           ],
