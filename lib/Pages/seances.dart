@@ -5,7 +5,8 @@ import 'package:evals7/Model/seance.dart';
 import 'package:evals7/helper/boxes.dart';
 import 'package:evals7/helper/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'addSeances.dart';
+import 'detailSeances.dart';
+import '../main.dart';
 
 class WorkoutSessionsScreen extends StatefulWidget {
   const WorkoutSessionsScreen({Key? key}) : super(key: key);
@@ -22,12 +23,6 @@ class SeanceState extends State<WorkoutSessionsScreen> {
 
   final seanceNameController = TextEditingController();
   String selectedJourType = 'Lundi';
-
-  @override
-  void dispose() {
-    super.dispose();
-    seanceNameController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +166,15 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                           //subtitle: Text('Jour: ${seance.jourSeance}'),
                           // subtitle: const Text('Seance'),
                           trailing: Text('Jour: ${seance.jourSeance}'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailSeanceScreen(
+                                    seance: seance = boxSeance.getAt(index)),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -192,5 +196,11 @@ class SeanceState extends State<WorkoutSessionsScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    seanceNameController.dispose();
   }
 }

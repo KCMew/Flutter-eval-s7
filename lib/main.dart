@@ -1,14 +1,17 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, sort_child_properties_last, duplicate_ignore, deprecated_member_use, prefer_const_literals_to_create_immutables
 
+import 'package:evals7/Pages/detailSeances.dart';
 import 'package:evals7/helper/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'Model/seance.dart';
 import 'Pages/home.dart';
 import 'Pages/seances.dart';
 import 'Pages/statistiques.dart';
 import 'Pages/parametres.dart';
 
-void main() async { 
-  await DatabaseHelper.setupDatabase();
+void main() async {
+  await DatabaseHelper.setupDatabaseSeance();
+  await DatabaseHelper.setupDatabaseDetailSeance();
   runApp(const MyApp());
 }
 
