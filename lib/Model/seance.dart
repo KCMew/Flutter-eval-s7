@@ -11,7 +11,6 @@ class Seance {
   @HiveField(2)
   String jourSeance;
 
-  Seance({required this.nomSeance, required this.jourSeance});
   Seance(
       {required this.key, required this.nomSeance, required this.jourSeance});
 }
