@@ -124,6 +124,7 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                               final repetitionNb =
                                   int.tryParse(repetitionController.text);
                               final seanceName = widget.seance.nomSeance;
+                              final foreignKey = widget.seance.key;
                               setState(() {
                                 boxDetailSeance.put(
                                   'key_$exoNameController',
@@ -131,10 +132,11 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                                       nomSeance: seanceName,
                                       nomExo: exoName,
                                       nbSerie: serieNb,
-                                      nbRepetition: repetitionNb),
+                                      nbRepetition: repetitionNb,
+                                      foreignkey: foreignKey),
                                 );
                               });
-                              print("add");
+                              print('add : $foreignKey');
                             }
                           },
                           child: const Text('Ajouter'),
@@ -154,17 +156,17 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                     child: ListView.builder(
                       itemCount: boxDetailSeance.values
                           .where((detailSeance) =>
-                              detailSeance.nomSeance == widget.seance.nomSeance)
+                              detailSeance.foreignkey == widget.seance.key)
                           .length,
                       itemBuilder: (contexte, index) {
                         /*  DetailSeance detailSeance =
                             boxDetailSeance.getAt(index); */
                         DetailSeance detailSeance = boxDetailSeance.values
                             .where((detailSeance) =>
-                                detailSeance.nomSeance ==
-                                widget.seance.nomSeance)
+                                detailSeance.foreignkey == widget.seance.key)
                             .elementAt(index);
                         print("test : ${widget.seance.nomSeance}");
+                        print("test bis : ${widget.seance.key}");
 
                         return ListTile(
                           leading: IconButton(

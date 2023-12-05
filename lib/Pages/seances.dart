@@ -3,10 +3,8 @@
 
 import 'package:evals7/Model/seance.dart';
 import 'package:evals7/helper/boxes.dart';
-import 'package:evals7/helper/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'detailSeances.dart';
-import '../main.dart';
 
 class WorkoutSessionsScreen extends StatefulWidget {
   const WorkoutSessionsScreen({Key? key}) : super(key: key);
@@ -129,10 +127,14 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                                 boxSeance.put(
                                   'key_$seanceNameController',
                                   Seance(
-                                      nomSeance: seanceName,
-                                      jourSeance: selectedJourType),
+                                    key: 'key_$seanceNameController',
+                                    nomSeance: seanceName,
+                                    jourSeance: selectedJourType,
+                                  ),
                                 );
+                                print('key_$seanceNameController');
                               });
+                              print('^test est ets $_formKey');
                             }
                           },
                           child: const Text('Ajouter'),
@@ -174,6 +176,7 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                                     seance: seance = boxSeance.getAt(index)),
                               ),
                             );
+                            print('terevev $boxSeance.getAt(index)');
                           },
                         );
                       },

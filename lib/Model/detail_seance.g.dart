@@ -21,13 +21,14 @@ class DetailSeanceAdapter extends TypeAdapter<DetailSeance> {
       nomExo: fields[1] as String,
       nbRepetition: fields[2] as int?,
       nbSerie: fields[3] as int?,
+      foreignkey: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, DetailSeance obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.nomSeance)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class DetailSeanceAdapter extends TypeAdapter<DetailSeance> {
       ..writeByte(2)
       ..write(obj.nbRepetition)
       ..writeByte(3)
-      ..write(obj.nbSerie);
+      ..write(obj.nbSerie)
+      ..writeByte(4)
+      ..write(obj.foreignkey);
   }
 
   @override

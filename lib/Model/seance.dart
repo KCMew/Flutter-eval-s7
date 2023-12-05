@@ -5,9 +5,13 @@ part 'seance.g.dart';
 @HiveType(typeId: 1)
 class Seance {
   @HiveField(0)
-  String nomSeance;
+  String key;
   @HiveField(1)
+  String nomSeance;
+  @HiveField(2)
   String jourSeance;
 
   Seance({required this.nomSeance, required this.jourSeance});
+  Seance(
+      {required this.key, required this.nomSeance, required this.jourSeance});
 }

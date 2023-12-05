@@ -12,10 +12,14 @@ class DetailSeance {
   int? nbRepetition;
   @HiveField(3)
   int? nbSerie;
+  @HiveField(4)
+  String foreignkey;
 
-  DetailSeance(
-      {required this.nomSeance,
-      required this.nomExo,
-      required this.nbRepetition,
-      required this.nbSerie});
+  DetailSeance({
+    required this.nomSeance,
+    required this.nomExo,
+    required this.nbRepetition,
+    required this.nbSerie,
+    required this.foreignkey,
+  });
 }

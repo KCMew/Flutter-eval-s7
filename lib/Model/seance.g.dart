@@ -17,18 +17,21 @@ class SeanceAdapter extends TypeAdapter<Seance> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Seance(
-      nomSeance: fields[0] as String,
-      jourSeance: fields[1] as String,
+      key: fields[0] as String,
+      nomSeance: fields[1] as String,
+      jourSeance: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Seance obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.nomSeance)
+      ..write(obj.key)
       ..writeByte(1)
+      ..write(obj.nomSeance)
+      ..writeByte(2)
       ..write(obj.jourSeance);
   }
 
