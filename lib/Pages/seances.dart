@@ -176,7 +176,6 @@ class SeanceState extends State<WorkoutSessionsScreen> {
                                     seance: seance = boxSeance.getAt(index)),
                               ),
                             );
-                            print('terevev $boxSeance.getAt(index)');
                           },
                         );
                       },

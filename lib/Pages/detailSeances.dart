@@ -165,8 +165,9 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                             .where((detailSeance) =>
                                 detailSeance.foreignkey == widget.seance.key)
                             .elementAt(index);
-                        print("test : ${widget.seance.nomSeance}");
-                        print("test bis : ${widget.seance.key}");
+                        print("--------------------------------");
+                        print("test key depuis detail : ${widget.seance.key}");
+                        print("--------------------------------");
 
                         return ListTile(
                           leading: IconButton(
