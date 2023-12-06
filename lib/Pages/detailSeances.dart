@@ -1,5 +1,6 @@
-// statistiques.dart
-// ignore_for_file: file_names
+// ignore_for_file: file_names, prefer_final_fields, avoid_print, prefer_const_constructors
+
+import 'dart:async';
 
 import 'package:evals7/Model/detail_seance.dart';
 import 'package:evals7/Model/seance.dart';
@@ -17,7 +18,6 @@ class DetailSeanceScreen extends StatefulWidget {
 }
 
 class DetailSeanceState extends State<DetailSeanceScreen> {
-  //late final Seance seance;
   final _formKey = GlobalKey<FormState>();
   bool _isVisible = false;
 
@@ -25,7 +25,15 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
   final repetitionController = TextEditingController();
   final serieController = TextEditingController();
 
-  final String selectedJourType = 'Lundi';
+  late Timer _timer;
+  Map<String, int> _elapsedSecondsMap = {};
+  String? _activeExerciseKey;
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +44,8 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
       body: Center(
         child: Column(
           children: [
-            // Bouton pour afficher la zone
             ElevatedButton(
-              child: const Text(
-                'Ajouter un nouveau exercice',
-              ),
+              child: const Text('Ajouter un nouveau exercice'),
               onPressed: () {
                 setState(() {
                   _isVisible = !_isVisible;
@@ -48,7 +53,6 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
               },
             ),
 
-            // Zone cachée par défaut
             if (_isVisible)
               Container(
                 margin: const EdgeInsets.all(20),
@@ -125,16 +129,19 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                                   int.tryParse(repetitionController.text);
                               final seanceName = widget.seance.nomSeance;
                               final foreignKey = widget.seance.key;
+                              final exerciseKey = 'key_$exoNameController';
                               setState(() {
                                 boxDetailSeance.put(
-                                  'key_$exoNameController',
+                                  exerciseKey,
                                   DetailSeance(
-                                      nomSeance: seanceName,
-                                      nomExo: exoName,
-                                      nbSerie: serieNb,
-                                      nbRepetition: repetitionNb,
-                                      foreignkey: foreignKey),
+                                    nomSeance: seanceName,
+                                    nomExo: exoName,
+                                    nbSerie: serieNb,
+                                    nbRepetition: repetitionNb,
+                                    foreignkey: foreignKey,
+                                  ),
                                 );
+                                _elapsedSecondsMap[exerciseKey] = 0;
                               });
                               print('add : $foreignKey');
                             }
@@ -159,62 +166,53 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                               detailSeance.foreignkey == widget.seance.key)
                           .length,
                       itemBuilder: (contexte, index) {
-                        /*  DetailSeance detailSeance =
-                            boxDetailSeance.getAt(index); */
                         DetailSeance detailSeance = boxDetailSeance.values
                             .where((detailSeance) =>
                                 detailSeance.foreignkey == widget.seance.key)
                             .elementAt(index);
-                        print("test : ${widget.seance.nomSeance}");
-                        print("test bis : ${widget.seance.key}");
+
+                        final exerciseKey = 'key_${detailSeance.nomExo}';
+                        final isTimerActive =
+                            _activeExerciseKey == exerciseKey;
 
                         return ListTile(
                           leading: IconButton(
                             onPressed: () {
                               setState(() {
                                 boxDetailSeance.deleteAt(index);
+                                _elapsedSecondsMap.remove(exerciseKey);
+                                _resetTimer();
                               });
                             },
                             icon: const Icon(Icons.delete),
                           ),
                           title: Text(detailSeance.nomExo),
-                          subtitle:
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text('Nombre de série : ${detailSeance.nbSerie}'),
-                          // subtitle: const Text('Seance'),
-                          trailing: Text(
-                              'Nombre de répétition : ${detailSeance.nbRepetition}'),
+                              Text(
+                                  'Nombre de répétition : ${detailSeance.nbRepetition}'),
+                              Text(
+                                'Temps écoulé : ${_formatElapsedTime(_elapsedSecondsMap[exerciseKey] ?? 0)}',
+                              ),
+                            ],
+                          ),
+                          trailing: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                if (isTimerActive) {
+                                  _resetTimer();
+                                } else {
+                                  _startTimer(exerciseKey);
+                                }
+                              });
+                            },
+                            child: Text(isTimerActive ? 'Arrêter' : 'Démarrer'),
+                          ),
                         );
                       },
                     ),
-
-                    /*  child: ListView.builder(
-                      itemCount: boxDetailSeance.values
-                          .where((detailSeance) =>
-                              detailSeance.nomExo == widget.seance.nomSeance)
-                          .length,
-                      itemBuilder: (contexte, index) {
-                        DetailSeance detailSeance = boxDetailSeance.values
-                            .where((detailSeance) =>
-                                detailSeance.nomExo == widget.seance.nomSeance)
-                            .elementAt(index);
-                        return ListTile(
-                          leading: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                boxDetailSeance.deleteAt(index);
-                              });
-                            },
-                            icon: const Icon(Icons.delete),
-                          ),
-                          title: Text(detailSeance.nomExo),
-                          subtitle:
-                              Text('Nombre de série : ${detailSeance.nbSerie}'),
-                          trailing: Text(
-                            'Nombre de répétition : ${detailSeance.nbRepetition}',
-                          ),
-                        );
-                      },
-                    ), */
                   ),
                 ),
               ),
@@ -233,5 +231,25 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
         ),
       ),
     );
+  }
+
+  void _startTimer(String exerciseKey) {
+    _activeExerciseKey = exerciseKey;
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSecondsMap[exerciseKey] = (_elapsedSecondsMap[exerciseKey] ?? 0) + 1;
+      });
+    });
+  }
+
+  void _resetTimer() {
+    _timer.cancel();
+    _activeExerciseKey = null;
+  }
+
+  String _formatElapsedTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }

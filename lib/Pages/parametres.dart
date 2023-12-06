@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../main.dart';
 
 class ParametresScreen extends StatefulWidget {
@@ -22,21 +21,29 @@ class SettingsState extends State<ParametresScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Mode sombre'),
-            Switch(
-              value: isDarkMode,
-              onChanged: (value) {
-                setState(() {
-                  isDarkMode = value;
-                });
-                ThemeMode themeMode =
-                    isDarkMode ? ThemeMode.dark : ThemeMode.light;
-                MyApp.setTheme(context, themeMode);
+            ElevatedButton(
+              onPressed: () {
+                setThemeMode(ThemeMode.light);
               },
+              child: const Text('Thème clair'),
+            ),
+           const SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                setThemeMode(ThemeMode.dark);
+              },
+              child: const Text('Thème sombre'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void setThemeMode(ThemeMode themeMode) {
+    setState(() {
+      isDarkMode = themeMode == ThemeMode.dark;
+    });
+    MyApp.setTheme(context, themeMode);
   }
 }
