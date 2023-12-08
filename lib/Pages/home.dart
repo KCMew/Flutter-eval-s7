@@ -1,5 +1,3 @@
-// ignore_for_file: file_names, prefer_const_constructors, deprecated_member_use, prefer_const_literals_to_create_immutables
-
 import 'package:evals7/Model/seance.dart';
 import 'package:evals7/helper/boxes.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +8,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  SeanceState createState() => SeanceState();
+  HomeState createState() => HomeState();
 }
 
-class SeanceState extends State<HomeScreen> {
-  bool isDarkMode = false;
-  final seanceNameController = TextEditingController();
-  String selectedJourType = 'Lundi';
-
+class HomeState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final currentDay = DateTime.now().weekday;
@@ -65,7 +59,7 @@ class SeanceState extends State<HomeScreen> {
                             fit: BoxFit.cover,
                           ),
                           title: Text(seance.nomSeance),
-                          trailing: Row(
+                          trailing: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
@@ -97,12 +91,6 @@ class SeanceState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    seanceNameController.dispose();
   }
 
   String getLocalDay(int day) {

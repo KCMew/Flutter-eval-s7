@@ -9,6 +9,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 class DatabaseHelper {
   static const seanceTable = "seance";
   static const detailSeanceTable = "detailseance";
+  static const parametreTable = "parametre";
+  static const statistiqueTable = "statistique";
 
   static Future<void> setupDatabaseSeance() async {
     await Hive.initFlutter();
@@ -20,5 +22,15 @@ class DatabaseHelper {
     await Hive.initFlutter();
     Hive.registerAdapter(DetailSeanceAdapter());
     boxDetailSeance = await Hive.openBox<DetailSeance>(detailSeanceTable);
+  }
+
+  static Future<void> setupDatabaseParametre() async {
+    await Hive.initFlutter();
+    boxParametre = await Hive.openBox(parametreTable);
+  }
+
+  static Future<void> setupDatabaseStatistique() async {
+    await Hive.initFlutter();
+    boxStatistique = await Hive.openBox(statistiqueTable);
   }
 }

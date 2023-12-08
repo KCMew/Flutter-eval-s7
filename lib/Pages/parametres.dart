@@ -1,3 +1,4 @@
+import 'package:evals7/helper/boxes.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
 
@@ -9,7 +10,13 @@ class ParametresScreen extends StatefulWidget {
 }
 
 class SettingsState extends State<ParametresScreen> {
-  bool isDarkMode = false;
+  bool darkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    darkMode = boxParametre.get('darkmode') ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,29 +28,22 @@ class SettingsState extends State<ParametresScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                setThemeMode(ThemeMode.light);
+            const Text('Mode clair'),
+            Switch(
+              value: darkMode,
+              onChanged: (value) {
+                setState(() {
+                  darkMode = value;
+                  boxParametre.put('darkmode', darkMode);
+                });
+                ThemeMode themeMode =
+                    darkMode ? ThemeMode.light : ThemeMode.dark;
+                MyApp.setTheme(context, themeMode);
               },
-              child: const Text('Thème clair'),
-            ),
-           const SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: () {
-                setThemeMode(ThemeMode.dark);
-              },
-              child: const Text('Thème sombre'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void setThemeMode(ThemeMode themeMode) {
-    setState(() {
-      isDarkMode = themeMode == ThemeMode.dark;
-    });
-    MyApp.setTheme(context, themeMode);
   }
 }

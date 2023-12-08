@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, sort_child_properties_last, duplicate_ignore, deprecated_member_use, prefer_const_literals_to_create_immutables
 
+import 'package:evals7/helper/boxes.dart';
 import 'package:evals7/helper/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'Pages/home.dart';
@@ -10,19 +11,22 @@ import 'Pages/parametres.dart';
 void main() async {
   await DatabaseHelper.setupDatabaseSeance();
   await DatabaseHelper.setupDatabaseDetailSeance();
+  await DatabaseHelper.setupDatabaseParametre();
+  await DatabaseHelper.setupDatabaseStatistique();
   runApp(const MyApp());
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
 
   @override
-  MyHomePageState createState() => MyHomePageState();
+  MainPageState createState() => MainPageState();
 }
 
-class MyHomePageState extends State<MyHomePage> {
+class MainPageState extends State<MainPage> {
   int currentIndex = 0;
-  ThemeMode themeMode = ThemeMode.light;
+  late ThemeMode themeMode;
+  bool darkMode = false;
 
   final List<Widget> pages = [
     const HomeScreen(),
@@ -68,11 +72,22 @@ class MyHomePageState extends State<MyHomePage> {
               label: 'Paramètres',
             ),
           ],
-          selectedItemColor: Colors.blue,
+          selectedItemColor: Colors.purple,
           unselectedItemColor: Colors.grey,
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    darkMode = boxParametre.get('darkmode') ?? false;
+    if (darkMode == true) {
+      themeMode = ThemeMode.light;
+    } else {
+      themeMode = ThemeMode.dark;
+    }
   }
 
   void setTheme(ThemeMode mode) {
@@ -84,8 +99,8 @@ class MyHomePageState extends State<MyHomePage> {
 
 class MyApp extends StatelessWidget {
   static void setTheme(BuildContext context, ThemeMode themeMode) {
-    final MyHomePageState state =
-        context.findAncestorStateOfType<MyHomePageState>()!;
+    final MainPageState state =
+        context.findAncestorStateOfType<MainPageState>()!;
     state.setTheme(themeMode);
   }
 
@@ -97,7 +112,8 @@ class MyApp extends StatelessWidget {
       title: 'Material App',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: MyHomePage(),
+      home: MainPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

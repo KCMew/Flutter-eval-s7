@@ -1,7 +1,9 @@
 // ignore_for_file: file_names, prefer_final_fields, avoid_print, prefer_const_constructors
 
 import 'dart:async';
+import 'dart:math';
 
+import 'package:evals7/Model/chronometre.dart';
 import 'package:evals7/Model/detail_seance.dart';
 import 'package:evals7/Model/seance.dart';
 import 'package:flutter/material.dart';
@@ -20,23 +22,38 @@ class DetailSeanceScreen extends StatefulWidget {
 class DetailSeanceState extends State<DetailSeanceScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isVisible = false;
+  bool _isVisibleChrono = false;
+
+  bool _stateChronoCommencer = true;
+  bool _stateChronoPause = false;
+  bool _stateChronoTerminer = false;
+  bool _stateChronoReprendre = false;
 
   final exoNameController = TextEditingController();
   final repetitionController = TextEditingController();
   final serieController = TextEditingController();
 
+  late Stopwatch _stopwatch;
   late Timer _timer;
+  bool _isRunning = false;
+
   Map<String, int> _elapsedSecondsMap = {};
-  String? _activeExerciseKey;
+
+  late Chronometre chrono;
+  late DetailSeance detailSeance;
 
   @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _stopwatch = Stopwatch();
+    chrono = Chronometre();
+    _timer = Timer.periodic(const Duration(milliseconds: 30), _updateTime);
   }
 
   @override
   Widget build(BuildContext context) {
+    String formattedTime = chrono.formatTime(_stopwatch.elapsedMilliseconds);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Exercices'),
@@ -44,13 +61,118 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
       body: Center(
         child: Column(
           children: [
-            ElevatedButton(
-              child: const Text('Ajouter un nouveau exercice'),
-              onPressed: () {
-                setState(() {
-                  _isVisible = !_isVisible;
-                });
-              },
+            // if (_isVisibleChrono)
+            Container(
+              width: 400,
+              margin: const EdgeInsets.only(bottom: 10),
+              child: ElevatedButton(
+                child: const Text('Commencer la séance'),
+                onPressed: () {
+                  setState(() {
+                    _isVisibleChrono = !_isVisibleChrono;
+                  });
+                },
+              ),
+            ),
+            if (_isVisibleChrono)
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                //key: _formKey,
+                child: Column(
+                  children: [
+                    Text(
+                      formattedTime,
+                      style: const TextStyle(fontSize: 48.0),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: Column(
+                        children: [
+                          if (_stateChronoCommencer)
+                            Container(
+                              width: 300,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _start();
+                                  setState(() {
+                                    _stateChronoCommencer =
+                                        !_stateChronoCommencer;
+                                    _stateChronoPause = !_stateChronoPause;
+                                    _stateChronoTerminer =
+                                        !_stateChronoTerminer;
+                                  });
+                                },
+                                child: Text("Commencer la séance"),
+                              ),
+                            ),
+                          if (_stateChronoPause)
+                            Container(
+                              width: 300,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _stop();
+                                  setState(() {
+                                    _stateChronoReprendre = true;
+                                    _stateChronoPause = false;
+                                  });
+                                },
+                                child: Text("Mettre en pause la séance"),
+                              ),
+                            ),
+                          if (_stateChronoReprendre)
+                            Container(
+                              width: 300,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _start();
+                                  setState(() {
+                                    _stateChronoPause = true;
+                                    _stateChronoReprendre = false;
+                                  });
+                                },
+                                child: Text("Reprendre la séance"),
+                              ),
+                            ),
+                          if (_stateChronoTerminer)
+                            Container(
+                              width: 300,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _reset();
+                                  setState(() {
+                                    _stateChronoCommencer =
+                                        !_stateChronoCommencer;
+                                    _stateChronoPause = !_stateChronoPause;
+                                    _stateChronoTerminer =
+                                        !_stateChronoTerminer;
+                                  });
+
+                                  String content = formattedTime;
+                                  boxStatistique.add(content);
+                                },
+                                child: Text("Terminer la séance"),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            SizedBox(
+              width: 400,
+              child: ElevatedButton(
+                child: const Text('Ajouter un nouveau exercice'),
+                onPressed: () {
+                  setState(() {
+                    _isVisible = !_isVisible;
+                  });
+                },
+              ),
             ),
             if (_isVisible)
               Container(
@@ -142,7 +264,9 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                                 );
                                 _elapsedSecondsMap[exerciseKey] = 0;
                               });
-                              print('add : $foreignKey');
+                              exoNameController.clear();
+                              repetitionController.clear();
+                              serieController.clear();
                             }
                           },
                           child: const Text('Ajouter'),
@@ -164,24 +288,19 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                               detailSeance.foreignkey == widget.seance.key)
                           .length,
                       itemBuilder: (contexte, index) {
-                        DetailSeance detailSeance = boxDetailSeance.values
+                        detailSeance = boxDetailSeance.values
                             .where((detailSeance) =>
                                 detailSeance.foreignkey == widget.seance.key)
                             .elementAt(index);
 
                         final exerciseKey = 'key_${detailSeance.nomExo}';
-                        final isTimerActive = _activeExerciseKey == exerciseKey;
-                        print("--------------------------------");
-                        print("test key depuis detail : ${widget.seance.key}");
-                        print("--------------------------------");
-
                         return ListTile(
                           leading: IconButton(
                             onPressed: () {
                               setState(() {
                                 boxDetailSeance.deleteAt(index);
                                 _elapsedSecondsMap.remove(exerciseKey);
-                                _resetTimer();
+                                // _resetTimer();
                               });
                             },
                             icon: const Icon(Icons.delete),
@@ -193,22 +312,7 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
                               Text('Nombre de série : ${detailSeance.nbSerie}'),
                               Text(
                                   'Nombre de répétition : ${detailSeance.nbRepetition}'),
-                              Text(
-                                'Temps écoulé : ${_formatElapsedTime(_elapsedSecondsMap[exerciseKey] ?? 0)}',
-                              ),
                             ],
-                          ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                if (isTimerActive) {
-                                  _resetTimer();
-                                } else {
-                                  _startTimer(exerciseKey);
-                                }
-                              });
-                            },
-                            child: Text(isTimerActive ? 'Arrêter' : 'Démarrer'),
                           ),
                         );
                       },
@@ -233,24 +337,36 @@ class DetailSeanceState extends State<DetailSeanceScreen> {
     );
   }
 
-  void _startTimer(String exerciseKey) {
-    _activeExerciseKey = exerciseKey;
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        _elapsedSecondsMap[exerciseKey] =
-            (_elapsedSecondsMap[exerciseKey] ?? 0) + 1;
-      });
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _updateTime(Timer timer) {
+    if (_isRunning) {
+      setState(() {});
+    }
+  }
+
+  void _start() {
+    setState(() {
+      _isRunning = true;
+      _stopwatch.start();
     });
   }
 
-  void _resetTimer() {
-    _timer.cancel();
-    _activeExerciseKey = null;
+  void _stop() {
+    setState(() {
+      _isRunning = false;
+      _stopwatch.stop();
+    });
   }
 
-  String _formatElapsedTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final remainingSeconds = seconds % 60;
-    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
+  void _reset() {
+    setState(() {
+      _stopwatch.reset();
+      _isRunning = false;
+    });
   }
 }
