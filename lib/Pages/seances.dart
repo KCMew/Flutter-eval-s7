@@ -3,7 +3,6 @@
 
 import 'dart:math';
 
-import 'package:evals7/Model/detail_seance.dart';
 import 'package:evals7/Model/seance.dart';
 import 'package:evals7/helper/boxes.dart';
 import 'package:flutter/material.dart';

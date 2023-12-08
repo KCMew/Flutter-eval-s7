@@ -1,7 +1,6 @@
 // ignore_for_file: file_names, prefer_final_fields, avoid_print, prefer_const_constructors
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:evals7/Model/chronometre.dart';
 import 'package:evals7/Model/detail_seance.dart';
